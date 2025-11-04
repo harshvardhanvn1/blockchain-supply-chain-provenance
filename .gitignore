@@ -10,6 +10,29 @@ states/
 *.dbg.json
 *.tsbuildinfo
 
-# Optional
+
+# Node modules
+node_modules/
+/client/node_modules/
+
+# Environment variables
 .env
 .env.local
+
+# Build files
+/client/build/
+dist/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Private keys (NEVER commit these!)
+*.pem
+*.key
+private/
+secrets/
