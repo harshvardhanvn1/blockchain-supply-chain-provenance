@@ -6,9 +6,6 @@ A decentralized supply chain tracking system built on Polygon blockchain that en
 
 This system tracks agricultural products from creation through delivery using blockchain technology, providing immutable records and role-based access control for manufacturers, distributors, retailers, and regulators.
 
-**Course:** CSE 540 - Engineering Blockchain Applications  
-**Semester:** Fall B 2025  
-**Institution:** Arizona State University
 
 ---
 
@@ -400,10 +397,10 @@ getStatusHistory(batchId)
 
 | Name | Role | GitHub | Contribution |
 |------|------|--------|-------------|
-| [Your Name] | Smart Contract Lead | [@username] | Contract development, deployment |
-| [Teammate 2] | Frontend Lead | [@username] | React UI, Web3 integration |
-| [Teammate 3] | Testing Lead | [@username] | Testing, documentation |
-| [Teammate 4] | Project Manager | [@username] | Coordination, reporting |
+| Harshvardhan Vikrambhai Nagar | Smart Contract architect | [@harshvardhanvn1] | Contract development, deployment |
+| Vedant Padole | Smart Contract architect| [@VedantPadole1405] | Contract development, deployment |
+| Samik Nayak | Frontend Lead | [@scnyk] | React UI, Web3 integration |
+| Prarthan | Project Manager | [@Prxthn] | Coordination, reporting |
 
 ---
 
