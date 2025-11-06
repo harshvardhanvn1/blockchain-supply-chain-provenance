@@ -32,7 +32,7 @@ This system tracks agricultural products from creation through delivery using bl
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        Users / Roles                         │
+│                        Users / Roles                        │
 ├──────────────┬──────────────┬──────────────┬────────────────┤
 │ Manufacturer │ Distributor  │   Retailer   │   Regulator    │
 └──────┬───────┴──────┬───────┴──────┬───────┴────────┬───────┘
@@ -76,9 +76,9 @@ This system tracks agricultural products from creation through delivery using bl
 
 ```
 ╔══════════════════════════════════════════════════════════════╗
-║              AgriProvenance Smart Contract                    ║
+║              AgriProvenance Smart Contract                   ║
 ╠══════════════════════════════════════════════════════════════╣
-║                                                               ║
+║                                                              ║
 ║  STATE VARIABLES                                             ║
 ║  ├─ batches: mapping(bytes32 => Batch)                       ║
 ║  ├─ roles: mapping(address => Role)                          ║
