@@ -1,20 +1,20 @@
-# 🔗 Blockchain Supply Chain Provenance System
+# Blockchain Supply Chain Provenance System
 
 A decentralized supply chain tracking system built on Polygon blockchain that ensures transparency, traceability, and trust among all participants in a product's lifecycle.
 
-## 📋 Project Overview
+## Project Overview
 
 This system tracks agricultural products from creation through delivery using blockchain technology, providing immutable records and role-based access control for manufacturers, distributors, retailers, and regulators.
 
 
 ---
 
-## 🚀 Live Deployment
+## Live Deployment
 
 ### **Smart Contract**
 - **Contract Address:** `0x2c5e8F70139Ac595776434C99526F982B126a858`
 - **Network:** Polygon Amoy Testnet (Chain ID: 80002)
-- **Status:** ✅ Deployed & Verified
+- **Status:** Deployed & Verified
 - **Explorer:** [View on PolygonScan](https://amoy.polygonscan.com/address/0x2c5e8F70139Ac595776434C99526F982B126a858)
 - **Verification:** [Sourcify](https://repo.sourcify.dev/80002/0x2c5e8F70139Ac595776434C99526F982B126a858/)
 
@@ -26,7 +26,7 @@ This system tracks agricultural products from creation through delivery using bl
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ### **High-Level Architecture**
 
@@ -79,41 +79,41 @@ This system tracks agricultural products from creation through delivery using bl
 ║              AgriProvenance Smart Contract                    ║
 ╠══════════════════════════════════════════════════════════════╣
 ║                                                               ║
-║  📊 STATE VARIABLES                                           ║
+║  STATE VARIABLES                                             ║
 ║  ├─ batches: mapping(bytes32 => Batch)                       ║
 ║  ├─ roles: mapping(address => Role)                          ║
 ║  ├─ batchHistory: mapping(bytes32 => StatusHistory[])        ║
 ║  ├─ admin: address                                           ║
 ║  └─ totalBatches: uint256                                    ║
-║                                                               ║
-║  📦 DATA STRUCTURES                                           ║
-║  ├─ Batch (id, owner, status, type, quality, metadata...)   ║
+║                                                              ║
+║  DATA STRUCTURES                                             ║
+║  ├─ Batch (id, owner, status, type, quality, metadata...)    ║
 ║  ├─ StatusHistory (status, actor, timestamp)                 ║
-║  ├─ Status enum (Created, InTransit, Delivered)             ║
+║  ├─ Status enum (Created, InTransit, Delivered)              ║
 ║  ├─ ProductType enum (Imported, Local)                       ║
 ║  ├─ QualityType enum (Organic, NonOrganic)                   ║
-║  └─ Role enum (None, Manufacturer, Distributor, Retailer,   ║
-║                Regulator)                                     ║
-║                                                               ║
-║  🔧 CORE FUNCTIONS                                            ║
+║  └─ Role enum (None, Manufacturer, Distributor, Retailer,    ║
+║                Regulator)                                    ║
+║                                                              ║
+║  CORE FUNCTIONS                                              ║
 ║  ├─ registerProduct() - Create new batch (Manufacturer)      ║
 ║  ├─ transferCustody() - Transfer ownership                   ║
 ║  ├─ updateStatus() - Update batch status                     ║
 ║  ├─ assignRole() - Assign user roles (Admin)                 ║
 ║  └─ getBatch() - Query batch details                         ║
-║                                                               ║
-║  🔐 ACCESS CONTROL                                            ║
+║                                                              ║
+║  ACCESS CONTROL                                              ║
 ║  ├─ onlyAdmin - Admin-only functions                         ║
 ║  ├─ onlyRole - Role-based restrictions                       ║
 ║  ├─ batchExists - Batch validation                           ║
 ║  └─ onlyBatchOwner - Owner verification                      ║
-║                                                               ║
-║  📡 EVENTS                                                    ║
+║                                                              ║
+║  EVENTS                                                      ║
 ║  ├─ ProductCreated                                           ║
 ║  ├─ OwnershipTransferred                                     ║
 ║  ├─ StatusUpdated                                            ║
 ║  └─ RoleAssigned                                             ║
-║                                                               ║
+║                                                              ║
 ╚══════════════════════════════════════════════════════════════╝
 ```
 
@@ -121,7 +121,7 @@ This system tracks agricultural products from creation through delivery using bl
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Product Journey                           │
+│                    Product Journey                          │
 └─────────────────────────────────────────────────────────────┘
 
 1. CREATION
@@ -175,31 +175,31 @@ This system tracks agricultural products from creation through delivery using bl
 
 ## ✨ Key Features
 
-### **🔐 Role-Based Access Control (RBAC)**
+### **Role-Based Access Control (RBAC)**
 - **Manufacturer:** Register products, initiate shipments
 - **Distributor:** Receive and forward products
 - **Retailer:** Final delivery and status updates
 - **Regulator:** Oversee and audit all transactions
 - **Admin:** Assign roles and manage system
 
-### **📦 Product Management**
+### **Product Management**
 - Unique batch identification using bytes32
 - IPFS integration for metadata storage
 - Product type classification (Imported/Local)
 - Quality certification (Organic/Non-Organic)
 
-### **🔄 Status Progression**
+### **Status Progression**
 - Enforced workflow: Created → InTransit → Delivered
 - Prevents invalid status transitions
 - Immutable once delivered
 
-### **📊 Complete Audit Trail**
+### **Complete Audit Trail**
 - Timestamp tracking for all actions
 - Status history for each product
 - Event logging for transparency
 - Ownership transfer records
 
-### **🛡️ Security Features**
+### **Security Features**
 - Input validation on all functions
 - Access control modifiers
 - Duplicate prevention
@@ -208,7 +208,7 @@ This system tracks agricultural products from creation through delivery using bl
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### **Blockchain**
 - **Platform:** Polygon Amoy Testnet (Ethereum Layer-2)
@@ -229,7 +229,7 @@ This system tracks agricultural products from creation through delivery using bl
 
 ---
 
-## 📂 Repository Structure
+## Repository Structure
 
 ```
 blockchain-supply-chain-provenance/
@@ -259,7 +259,7 @@ blockchain-supply-chain-provenance/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### **Prerequisites**
 - MetaMask browser extension
@@ -306,7 +306,7 @@ cd blockchain-supply-chain-provenance
 
 ---
 
-## 📝 Smart Contract Functions
+## Smart Contract Functions
 
 ### **Admin Functions**
 ```solidity
@@ -346,7 +346,7 @@ getCurrentStatus(bytes32 id) returns (string)
 
 ---
 
-## 🧪 Testing Guide
+## Testing Guide
 
 ### **Test Scenario 1: Role Assignment**
 ```javascript
@@ -393,7 +393,7 @@ getStatusHistory(batchId)
 ```
 
 
-## 👥 Team Members
+## Team Members
 
 | Name | Role | GitHub | Contribution |
 |------|------|--------|-------------|
@@ -404,7 +404,7 @@ getStatusHistory(batchId)
 
 ---
 
-## 🔗 Important Links
+## Important Links
 
 - **Live Contract:** [PolygonScan](https://amoy.polygonscan.com/address/0x2c5e8F70139Ac595776434C99526F982B126a858)
 - **Network Faucet:** [Get Test POL](https://faucet.polygon.technology)
@@ -413,16 +413,16 @@ getStatusHistory(batchId)
 
 ---
 
-## 🛡️ Security Considerations
+## Security Considerations
 
 ### **Implemented Security Measures**
-- ✅ Role-based access control
-- ✅ Input validation on all functions
-- ✅ Duplicate transaction prevention
-- ✅ Status progression enforcement
-- ✅ Ownership verification before transfers
-- ✅ Self-transfer prevention
-- ✅ Role verification for recipients
+- Role-based access control
+- Input validation on all functions
+- Duplicate transaction prevention
+- Status progression enforcement
+- Ownership verification before transfers
+- Self-transfer prevention
+- Role verification for recipients
 
 ### **Known Limitations**
 - Testnet only (not production-ready)
@@ -440,7 +440,7 @@ getStatusHistory(batchId)
 
 ---
 
-## 💰 Cost Analysis
+## Cost Analysis
 
 ### **Deployment Costs (Polygon Amoy Testnet)**
 | Operation | Gas Used | Cost (POL) | Cost (USD)* |

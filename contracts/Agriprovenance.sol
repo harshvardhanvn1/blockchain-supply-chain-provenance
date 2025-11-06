@@ -7,13 +7,13 @@ pragma solidity ^0.8.20;
  */
 contract AgriProvenance {
     
-    // ========== ENUMS ==========
+    // ENUMS
     enum Status { Created, InTransit, Delivered }
     enum ProductType { Imported, Local }
     enum QualityType { Organic, NonOrganic }
     enum Role { None, Manufacturer, Distributor, Retailer, Regulator }
     
-    // ========== STRUCTS ==========
+    // STRUCTS 
     struct Batch {
         bytes32 id;
         address owner;
@@ -32,7 +32,7 @@ contract AgriProvenance {
         uint256 timestamp;
     }
     
-    // ========== STATE VARIABLES ==========
+    // STATE VARIABLES
     mapping(bytes32 => Batch) public batches;
     mapping(address => Role) public roles;
     mapping(bytes32 => StatusHistory[]) public batchHistory;
@@ -40,7 +40,7 @@ contract AgriProvenance {
     address public admin;
     uint256 public totalBatches;
     
-    // ========== EVENTS ==========
+    // EVENTS
     event ProductCreated(
         bytes32 indexed batchId,
         address indexed creator,
@@ -67,7 +67,7 @@ contract AgriProvenance {
     
     event RoleAssigned(address indexed user, string role);
     
-    // ========== MODIFIERS ==========
+    // MODIFIERS
     modifier onlyAdmin() {
         require(msg.sender == admin, "Not admin");
         _;
@@ -88,13 +88,13 @@ contract AgriProvenance {
         _;
     }
     
-    // ========== CONSTRUCTOR ==========
+    // CONSTRUCTOR
     constructor() {
         admin = msg.sender;
         roles[msg.sender] = Role.Regulator;
     }
     
-    // ========== HELPER FUNCTIONS (Keep Original) ==========
+    // HELPER FUNCTIONS
     function _statusToString(Status s) internal pure returns (string memory) {
         if (s == Status.Created) return "Created";
         if (s == Status.InTransit) return "InTransit";
@@ -118,13 +118,13 @@ contract AgriProvenance {
         return "None";
     }
     
-    // ========== ROLE MANAGEMENT ==========
+    // ROLE MANAGEMENT
     function assignRole(address user, Role role) external onlyAdmin {
         roles[user] = role;
         emit RoleAssigned(user, _roleToString(role));
     }
     
-    // ========== CORE FUNCTIONS (Keep Original + Enhanced) ==========
+    // CORE FUNCTIONS
     
     /**
      * @notice Register a new product batch (Manufacturer only)
@@ -244,7 +244,7 @@ contract AgriProvenance {
         );
     }
     
-    // ========== VIEW FUNCTIONS (New) ==========
+    // VIEW FUNCTIONS 
     
     /**
      * @notice Get complete batch information
