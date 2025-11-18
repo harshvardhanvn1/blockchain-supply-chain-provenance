@@ -1,0 +1,8 @@
+node_modules
+build
+dist
+.cache
+.git
+coverage
+*.log
+.vscode
