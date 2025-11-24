@@ -3,6 +3,8 @@ import { connectWallet } from './utils/web3';
 import RegisterProduct from './components/RegisterProduct';
 import TransferProduct from './components/TransferProduct';
 import ProductList from './components/ProductList';
+import AssignRole from './components/AssignRole';
+import UpdateStatus from './components/UpdateStatus';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -34,8 +36,10 @@ function App() {
 			<div className="container mt-5">
 				{account ? (
 					<>
+						<AssignRole account={account} />
 						<RegisterProduct account={account} />
 						<TransferProduct account={account} />
+						<UpdateStatus account={account} />
 						<ProductList />
 					</>
 				) : (

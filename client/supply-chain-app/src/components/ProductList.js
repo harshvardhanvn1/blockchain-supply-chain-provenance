@@ -1,72 +1,87 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import contract from '../utils/contract';
+import web3 from '../utils/web3';
+
 function ProductList() {
-	const [products, setProducts] = useState([]);
-	const [loading, setLoading] = useState(true);
+	const [id, setId] = useState('');
+	const [batch, setBatch] = useState(null);
+	const [loading, setLoading] = useState(false);
 
-	useEffect(() => {
-		loadProducts();
-	}, []);
-
-	const loadProducts = async () => {
+	const normalizeId = (raw) => {
+		if (!raw) return raw;
+		if (raw.startsWith('0x')) return raw;
 		try {
-			const count = await contract.methods.productCount().call();
-			const productsList = [];
-			for (let i = 1; i <= count; i++) {
-				const product = await contract.methods.getProduct(i).call();
-				productsList.push({
-					id: product.id,
-					name: product.name,
-					category: product.category,
-					manufacturer: product.manufacturer,
-					currentOwner: product.currentOwner,
-					status: product.status,
-				});
-			}
-			setProducts(productsList);
-			setLoading(false);
-		} catch (error) {
-			console.error(error);
-			setLoading(false);
+			return web3.utils.asciiToHex(raw).padEnd(66, '0');
+		} catch (e) {
+			return raw;
 		}
 	};
 
-	if (loading) return <div>Loading products...</div>;
+	const fetchBatch = async (e) => {
+		e && e.preventDefault();
+		setLoading(true);
+		try {
+			const normalized = normalizeId(id);
+			const result = await contract.methods.getBatch(normalized).call();
+			setBatch(result);
+		} catch (err) {
+			console.error(err);
+			alert('Error fetching batch');
+			setBatch(null);
+		}
+		setLoading(false);
+	};
 
 	return (
-		<div className="card">
+		<div className="card mb-4">
 			<div className="card-body">
-				<h5 className="card-title">All Products</h5>
-				<button className="btn btn-info mb-3" onClick={loadProducts}>
-					Refresh
-				</button>
-				<table className="table">
-					<thead>
-						<tr>
-							<th>ID</th>
-							<th>Name</th>
-							<th>Category</th>
-							<th>Current Owner</th>
-							<th>Status</th>
-						</tr>
-					</thead>
-					<tbody>
-						{products.map((product) => (
-							<tr key={product.id}>
-								<td>{product.id}</td>
-								<td>{product.name}</td>
-								<td>{product.category}</td>
-								<td>
-									{product.currentOwner.substring(0, 6)}...
-									{product.currentOwner.substring(38)}
-								</td>
-								<td>
-									<span className="badge bg-success">{product.status}</span>
-								</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
+				<h5 className="card-title">Get Batch (contract: getBatch)</h5>
+				<form onSubmit={fetchBatch} className="mb-3">
+					<div className="mb-3">
+						<label className="form-label">ID (bytes32 or text)</label>
+						<input
+							type="text"
+							className="form-control"
+							value={id}
+							onChange={(e) => setId(e.target.value)}
+							placeholder="0x... or plain text"
+							required
+						/>
+					</div>
+					<button className="btn btn-info" type="submit" disabled={loading}>
+						{loading ? 'Fetching...' : 'Fetch Batch'}
+					</button>
+				</form>
+
+				{batch && (
+					<div>
+						<dl className="row">
+							<dt className="col-sm-3">Batch ID</dt>
+							<dd className="col-sm-9">{batch.batchId}</dd>
+
+							<dt className="col-sm-3">Owner</dt>
+							<dd className="col-sm-9">{batch.owner}</dd>
+
+							<dt className="col-sm-3">Status</dt>
+							<dd className="col-sm-9">{batch.status}</dd>
+
+							<dt className="col-sm-3">Product Type</dt>
+							<dd className="col-sm-9">{batch.productType}</dd>
+
+							<dt className="col-sm-3">Quality Type</dt>
+							<dd className="col-sm-9">{batch.qualityType}</dd>
+
+							<dt className="col-sm-3">metaCid</dt>
+							<dd className="col-sm-9">{batch.metaCid}</dd>
+
+							<dt className="col-sm-3">Created At (timestamp)</dt>
+							<dd className="col-sm-9">{batch.createdAt}</dd>
+
+							<dt className="col-sm-3">Last Updated</dt>
+							<dd className="col-sm-9">{batch.lastUpdated}</dd>
+						</dl>
+					</div>
+				)}
 			</div>
 		</div>
 	);
