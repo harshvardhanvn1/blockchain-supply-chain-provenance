@@ -5,6 +5,7 @@ import web3 from '../utils/web3';
 function ProductList() {
 	const [id, setId] = useState('');
 	const [batch, setBatch] = useState(null);
+	const [error, setError] = useState('');
 	const [loading, setLoading] = useState(false);
 
 	const normalizeId = (raw) => {
@@ -22,11 +23,53 @@ function ProductList() {
 		setLoading(true);
 		try {
 			const normalized = normalizeId(id);
-			const result = await contract.methods.getBatch(normalized).call();
+			const contractAddr = contract.options.address;
+			if (!contractAddr) throw new Error('Contract address is not set in the app');
+
+			// low-level call to see raw return data (helps diagnose ABI/address/network issues)
+			const data = contract.methods.getBatch(normalized).encodeABI();
+			const raw = await web3.eth.call({ to: contractAddr, data });
+			console.log('raw getBatch return:', raw);
+			if (!raw || raw === '0x' || raw === '0x0') {
+				throw new Error('Empty return from node — possible revert, no code at address, or wrong network');
+			}
+
+			// decode returned parameters using web3 ABI decoder (types from ABI)
+			const types = [
+				'bytes32',
+				'address',
+				'string',
+				'string',
+				'string',
+				'string',
+				'uint256',
+				'uint256',
+			];
+			let decoded;
+			try {
+				decoded = web3.eth.abi.decodeParameters(types, raw);
+			} catch (decErr) {
+				console.error('Failed to decode parameters:', decErr);
+				throw new Error('Parameter decoding failed — ABI mismatch or unexpected return format');
+			}
+
+			// map decoded values into result object similar to contract.getBatch return
+			const result = {
+				batchId: decoded[0],
+				owner: decoded[1],
+				status: decoded[2],
+				productType: decoded[3],
+				qualityType: decoded[4],
+				metaCid: decoded[5],
+				createdAt: decoded[6],
+				lastUpdated: decoded[7],
+			};
+
 			setBatch(result);
+			setError('');
 		} catch (err) {
-			console.error(err);
-			alert('Error fetching batch');
+			console.error('getBatch error:', err);
+			setError(err && err.message ? err.message : String(err));
 			setBatch(null);
 		}
 		setLoading(false);
@@ -53,6 +96,9 @@ function ProductList() {
 					</button>
 				</form>
 
+				{error && (
+					<div className="alert alert-danger">{error}</div>
+				)}
 				{batch && (
 					<div>
 						<dl className="row">
