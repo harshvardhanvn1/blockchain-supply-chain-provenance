@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { connectWallet, ensureAmoyNetwork } from './utils/web3';
-import { setContractAddress } from './utils/contract';
-import contract from './utils/contract';
+import contract, { setContractAddress } from './utils/contract';
+import { hasPermission } from './utils/permissions';
 import web3 from './utils/web3';
 import RegisterProduct from './components/RegisterProduct';
 import TransferProduct from './components/TransferProduct';
@@ -13,6 +13,7 @@ import './App.css';
 
 function App() {
 	const [account, setAccount] = useState('');
+	const [role, setRole] = useState('None');
 
 	const handleConnect = async () => {
 		const acc = await connectWallet();
@@ -24,6 +25,19 @@ function App() {
 			if (!ok) console.warn('Could not ensure Amoy network in wallet');
 		} catch (err) {
 			console.error('Network ensure failed', err);
+		}
+	};
+
+	// fetch role for connected account and set local role state
+	const fetchAndSetRole = async (acct) => {
+		if (!acct || !contract || !contract.methods) return setRole('None');
+		try {
+			const r = await contract.methods.getUserRole(acct).call();
+			console.log('user role from contract:', r);
+			setRole(r || 'None');
+		} catch (err) {
+			console.error('Failed to get user role from contract', err);
+			setRole('None');
 		}
 	};
 
@@ -53,6 +67,9 @@ function App() {
 		// keep the editable input in sync
 		const stored = window.localStorage.getItem('contractAddress') || contract.options.address || '';
 		setContractInput(stored);
+
+		// if account already connected, fetch role
+		if (account) fetchAndSetRole(account);
 	}, [account]);
 
 	const handleSaveContract = () => {
@@ -78,6 +95,8 @@ function App() {
 				}
 				const total = await contract.methods.totalBatches().call();
 				console.log('totalBatches:', total);
+				// fetch role after setting the contract address
+				if (account) await fetchAndSetRole(account);
 				alert('Contract address saved — validation succeeded');
 			} catch (err) {
 				console.error('Contract validation failed:', err);
@@ -99,6 +118,7 @@ function App() {
 			<nav className="navbar navbar-dark bg-dark">
 				<div className="container">
 					<span className="navbar-brand">Supply Chain Tracker</span>
+					{role && <span className="badge bg-info text-dark ms-3">Role: {role}</span>}
 					{account ? (
 						<span className="text-white">
 							{account.substring(0, 6)}...{account.substring(38)}
@@ -140,11 +160,11 @@ function App() {
 			<div className="container mt-5">
 				{account ? (
 					<>
-						<AssignRole account={account} />
-						<RegisterProduct account={account} />
-						<TransferProduct account={account} />
-						<UpdateStatus account={account} />
-						<ProductList />
+						{hasPermission(role, 'assignRole') && <AssignRole account={account} />}
+						{hasPermission(role, 'registerProduct') && <RegisterProduct account={account} />}
+						{hasPermission(role, 'transferProduct') && <TransferProduct account={account} />}
+						{hasPermission(role, 'updateStatus') && <UpdateStatus account={account} />}
+						{hasPermission(role, 'productList') && <ProductList />}
 					</>
 				) : (
 					<div className="alert alert-info">Please connect your MetaMask wallet to continue</div>
