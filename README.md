@@ -1,14 +1,15 @@
-# Blockchain Supply Chain Provenance System
+# Blockchain-Based Supply Chain Provenance System
 
-A decentralized supply chain tracking system built on Polygon blockchain that ensures transparency, traceability, and trust among all participants in a product's lifecycle.
+A decentralized supply chain tracking system built with Solidity and React for CSE 540 - Engineering Blockchain Applications at Arizona State University.
+
+**Live Demo:** (https://blockchain-supply-chain-provenance.vercel.app/)
 
 ## Project Overview
 
-This system tracks agricultural products from creation through delivery using blockchain technology, providing immutable records and role-based access control for manufacturers, distributors, retailers, and regulators.
+This project implements a blockchain-based provenance system for agricultural supply chains. The system tracks products from creation through distribution to delivery, maintaining an immutable audit trail on the Polygon Amoy testnet.
 
 
 ---
-
 ## Live Deployment
 
 ### **Smart Contract**
@@ -18,12 +19,26 @@ This system tracks agricultural products from creation through delivery using bl
 - **Explorer:** [View on PolygonScan](https://amoy.polygonscan.com/address/0x2c5e8F70139Ac595776434C99526F982B126a858)
 - **Verification:** [Sourcify](https://repo.sourcify.dev/80002/0x2c5e8F70139Ac595776434C99526F982B126a858/)
 
-### **Deployment Stats**
-- **Deployed:** November 4, 2025
-- **Gas Used:** ~1.5M gas
-- **Cost:** ~0.08 POL
-- **Compiler:** Solidity 0.8.20
+### Frontend Layer
+- **Framework:** React 19.2.0
+- **Blockchain Library:** Web3.js 1.10.0
+- **Styling:** Bootstrap 5.3.8
+- **Hosting:** Vercel
 
+---
+
+### System Flow
+```
+User Interface (React)
+        ↓
+MetaMask Wallet
+        ↓
+Web3.js Library
+        ↓
+Smart Contract (Solidity)
+        ↓
+Polygon Amoy Blockchain
+```
 ---
 
 ## System Architecture
@@ -65,11 +80,6 @@ This system tracks agricultural products from creation through delivery using bl
                 │   Polygon Amoy Testnet      │
                 │   (Blockchain Storage)      │
                 └─────────────────────────────┘
-                             │
-                    ┌────────▼─────────┐
-                    │  IPFS Storage    │
-                    │  (Metadata)      │
-                    └──────────────────┘
 ```
 
 ### **Smart Contract Architecture**
@@ -176,11 +186,18 @@ This system tracks agricultural products from creation through delivery using bl
 ## ✨ Key Features
 
 ### **Role-Based Access Control (RBAC)**
-- **Manufacturer:** Register products, initiate shipments
-- **Distributor:** Receive and forward products
-- **Retailer:** Final delivery and status updates
-- **Regulator:** Oversee and audit all transactions
-- **Admin:** Assign roles and manage system
+- Admin: Assign roles to participants
+- Manufacturer: Register new products
+- Distributor: Manage product transfers
+- Retailer: Mark products as delivered
+- Regulator: Audit system activity
+
+### Core Functionality
+- Product registration with unique identifiers
+- Ownership transfer tracking between parties
+- Status progression (Created → InTransit → Delivered)
+- Complete audit trail of all transactions
+- Event logging for transparency
 
 ### **Product Management**
 - Unique batch identification using bytes32
@@ -206,250 +223,288 @@ This system tracks agricultural products from creation through delivery using bl
 - Self-transfer prevention
 - Role verification before transfers
 
----
-
-## Technology Stack
-
-### **Blockchain**
-- **Platform:** Polygon Amoy Testnet (Ethereum Layer-2)
-- **Smart Contract Language:** Solidity 0.8.20
-- **Development Environment:** Remix IDE
-- **Wallet:** MetaMask
-
-### **Frontend** (Week 2-3)
-- **Framework:** React.js
-- **Blockchain Library:** Web3.js / Ethers.js
-- **UI Framework:** Bootstrap / Tailwind CSS
-- **State Management:** React Hooks
-
-### **Storage**
-- **On-Chain:** Contract state and events
-- **Off-Chain:** IPFS for product metadata
-- **Metadata Format:** JSON with IPFS CID
 
 ---
+## Installation and Setup
 
-## Repository Structure
-
-```
-blockchain-supply-chain-provenance/
-│
-├── contracts/
-│   ├── AgriProvenance.sol          # Main smart contract
-│   └── AgriProvenance_ABI.json     # Contract ABI
-│
-├── docs/
-│   ├── architecture.md             # Detailed architecture
-│   ├── deployment-info.md          # Deployment details
-│   └── testing-guide.md            # Testing instructions
-│
-├── client/                         # Frontend application (Week 2)
-│   ├── src/
-│   │   ├── components/
-│   │   ├── utils/
-│   │   └── App.js
-│   └── package.json
-│
-├── scripts/                        # Deployment scripts
-│
-├── .gitignore
-├── README.md
-└── LICENSE
-```
-
----
-
-## Getting Started
-
-### **Prerequisites**
+### Prerequisites
+- Node.js (v16 or higher)
 - MetaMask browser extension
-- Node.js (v16+) and npm
 - Git
-- Basic understanding of blockchain and smart contracts
 
-### **Setup Instructions**
-
-#### 1. **Install MetaMask**
-```bash
-# Download from: https://metamask.io
-# Create wallet and save recovery phrase
+### Smart Contract Deployment
+The smart contract is already deployed on Polygon Amoy testnet at:
+```
+0x2c5e8F70139Ac595776434C99526F982B126a858
 ```
 
-#### 2. **Add Polygon Amoy Network**
-- Network Name: `Polygon Amoy Testnet`
-- RPC URL: `https://rpc-amoy.polygon.technology`
-- Chain ID: `80002`
-- Currency Symbol: `POL`
-- Block Explorer: `https://amoy.polygonscan.com`
+### Frontend Setup
 
-#### 3. **Get Test Tokens**
+1. Clone the repository:
 ```bash
-# Visit: https://faucet.polygon.technology
-# Select: Polygon Amoy + POL
-# Enter your wallet address
-# Verify with Twitter/GitHub
-```
-
-#### 4. **Clone Repository**
-```bash
-git clone https://github.com/[your-username]/blockchain-supply-chain-provenance.git
+git clone https://github.com/harshvardhanvn1/blockchain-supply-chain-provenance.git
 cd blockchain-supply-chain-provenance
 ```
 
-#### 5. **Interact with Deployed Contract**
-- Open Remix IDE: https://remix.ethereum.org
-- Load contract: `contracts/AgriProvenance.sol`
-- Compile with Solidity 0.8.20
-- Deploy & Run → "At Address"
-- Enter contract address: `0x2c5e8F70139Ac595776434C99526F982B126a858`
-- Connect MetaMask and interact!
+2. Navigate to the React application:
+```bash
+cd client/supply-chain-app
+```
 
----
+3. Install dependencies:
+```bash
+npm install
+```
 
-## Smart Contract Functions
+4. Create environment configuration:
+```bash
+echo "REACT_APP_CONTRACT_ADDRESS=0x2c5e8F70139Ac595776434C99526F982B126a858" > .env
+```
 
-### **Admin Functions**
+5. Start the development server:
+```bash
+npm start
+```
+
+6. Access the application at http://localhost:3000
+
+### MetaMask Configuration
+
+Configure MetaMask with Polygon Amoy testnet:
+
+**Network Settings:**
+- Network Name: Polygon Amoy Testnet
+- RPC URL: https://rpc-amoy.polygon.technology
+- Chain ID: 80002
+- Currency Symbol: POL
+- Block Explorer URL: https://amoy.polygonscan.com
+
+**Get Test Tokens:**
+Visit https://faucet.polygon.technology to obtain test POL tokens.
+
+## Usage
+
+### System Workflow
+
+1. **Role Assignment (Admin Only)**
+   - Admin assigns appropriate roles to participant addresses
+   - Each participant can have one role
+
+2. **Product Registration (Manufacturer)**
+   - Manufacturer creates new product entry
+   - Provides unique ID and metadata
+   - Selects product and quality types
+   - Becomes initial product owner
+
+3. **Status Management (Owner)**
+   - Current owner can update product status
+   - Status must progress sequentially
+   - System enforces: Created → InTransit → Delivered
+
+4. **Ownership Transfer (Owner)**
+   - Current owner transfers custody to another participant
+   - Recipient must have an assigned role
+   - Transfer is recorded with timestamp
+
+5. **Audit Trail (All Users)**
+   - Anyone can query product details
+   - Complete history of status changes available
+   - Regulators can audit all system activity
+
+## Smart Contract Interface
+
+### Core Functions
+
+**Administrative Functions:**
 ```solidity
-assignRole(address user, Role role)
-// Assign roles to users (Manufacturer, Distributor, Retailer)
+function assignRole(address user, Role role) external onlyAdmin
 ```
 
-### **Manufacturer Functions**
+**Product Management:**
 ```solidity
-registerProduct(bytes32 id, string metaCid, ProductType pType, QualityType qType)
-// Register new product batch on blockchain
+function registerProduct(
+    bytes32 id,
+    string calldata metaCid,
+    ProductType pType,
+    QualityType qType
+) external onlyRole(Manufacturer)
+
+function transferCustody(bytes32 id, address newOwner) external onlyBatchOwner(id)
+
+function updateStatus(bytes32 id, Status newStatus) external onlyBatchOwner(id)
 ```
 
-### **All Authorized Users**
+**View Functions:**
 ```solidity
-transferCustody(bytes32 id, address newOwner)
-// Transfer product ownership to another party
-
-updateStatus(bytes32 id, Status newStatus)
-// Update product status (Created → InTransit → Delivered)
+function getBatch(bytes32 id) public view returns (...)
+function getStatusHistory(bytes32 id) public view returns (StatusHistory[])
+function getUserRole(address user) public view returns (string)
+function totalBatches() public view returns (uint256)
 ```
 
-### **View Functions (Free - No Gas)**
+### Events Emitted
 ```solidity
-getBatch(bytes32 id) returns (Batch details)
-// Get complete product information
-
-getStatusHistory(bytes32 id) returns (StatusHistory[])
-// Get complete audit trail
-
-getUserRole(address user) returns (string)
-// Check user's assigned role
-
-getCurrentStatus(bytes32 id) returns (string)
-// Get current product status
+event ProductCreated(bytes32 indexed batchId, address indexed creator, ...)
+event OwnershipTransferred(bytes32 indexed batchId, address indexed from, address indexed to, ...)
+event StatusUpdated(bytes32 indexed batchId, string fromStatus, string toStatus, ...)
+event RoleAssigned(address indexed user, string role)
 ```
 
----
+### Enumerations
 
-## Testing Guide
+**Roles:**
+- 0: None
+- 1: Manufacturer
+- 2: Distributor
+- 3: Retailer
+- 4: Regulator
 
-### **Test Scenario 1: Role Assignment**
-```javascript
-// 1. Assign yourself as Manufacturer
-assignRole("0xYourAddress", 1)  // 1 = Manufacturer
+**Status:**
+- 0: Created
+- 1: InTransit
+- 2: Delivered
 
-// 2. Verify role
-getUserRole("0xYourAddress")  // Returns "Manufacturer"
+**Product Types:**
+- 0: Imported
+- 1: Local
+
+**Quality Types:**
+- 0: Organic
+- 1: NonOrganic
+
+## Testing
+
+### Smart Contract Testing
+All contract functions were tested using Remix IDE on Polygon Amoy testnet:
+- Role assignment and access control validation
+- Product registration with duplicate ID prevention
+- Ownership transfer between different roles
+- Status update with progression enforcement
+- Event emission verification
+- Complete end-to-end workflow testing
+
+### Frontend Testing
+The React application was tested with live transactions:
+- MetaMask wallet connection
+- Network switching to Polygon Amoy
+- All CRUD operations on products
+- Role-based UI component rendering
+- Transaction confirmation and error handling
+- Gas estimation and transaction execution
+
+## Technical Implementation
+
+### Gas Optimization
+The frontend implements explicit gas estimation to handle varying RPC provider responses:
+- Manual gas estimation before each transaction
+- 20% buffer added to estimated gas
+- Separate gas price fetching
+- Fallback error handling for reverted transactions
+
+### Security Measures
+- All permissions enforced at smart contract level
+- Frontend only controls UI visibility
+- Owner verification for transfers and updates
+- Sequential status progression validation
+- Duplicate product ID prevention
+
+### Architecture Decisions
+- Single Web3 instance shared across application
+- Contract ABI imported directly into frontend
+- Role-based component rendering
+- Dynamic admin detection from contract
+
+## Project Structure
+```
+blockchain-supply-chain-provenance/
+├── client/
+│   └── supply-chain-app/
+│       ├── public/
+│       ├── src/
+│       │   ├── components/
+│       │   │   ├── AssignRole.js
+│       │   │   ├── RegisterProduct.js
+│       │   │   ├── TransferProduct.js
+│       │   │   ├── UpdateStatus.js
+│       │   │   ├── ProductList.js
+│       │   │   └── StatusHistory.js
+│       │   ├── utils/
+│       │   │   ├── web3.js
+│       │   │   ├── contract.js
+│       │   │   └── permissions.js
+│       │   ├── contracts/
+│       │   │   └── Agriprovenance_ABI.json
+│       │   ├── App.js
+│       │   ├── App.css
+│       │   └── index.js
+│       ├── package.json
+│       └── README.md
+├── contracts/
+│   └── Agriprovenance.sol
+└── README.md
 ```
 
-### **Test Scenario 2: Register Product**
-```javascript
-// Register new agricultural product
-registerProduct(
-  "0x1111111111111111111111111111111111111111111111111111111111111111",
-  "QmTestBatch001",  // IPFS CID
-  1,                 // Local
-  0                  // Organic
-)
+## Future Enhancements
 
-// Verify registration
-totalBatches()  // Should return 1
-```
+Potential improvements identified for future development:
 
-### **Test Scenario 3: Complete Workflow**
-```javascript
-// 1. Manufacturer creates product
-registerProduct(...)
+**IPFS Integration**
+- Store product images and detailed metadata on IPFS
+- Use metaCid field to reference IPFS content
+- Enable decentralized document storage
 
-// 2. Transfer to Distributor
-transferCustody(batchId, distributorAddress)
+**Additional Features**
+- QR code generation for product lookups
+- Multi-signature approval for transfers
+- Batch product operations
+- Mobile application development
+- Real-time notifications
+- Advanced analytics dashboard
 
-// 3. Distributor updates status
-updateStatus(batchId, 1)  // 1 = InTransit
+## Known Limitations
 
-// 4. Transfer to Retailer
-transferCustody(batchId, retailerAddress)
+- Metadata is currently stored as plain string (IPFS integration not implemented)
+- Gas costs vary with network congestion
+- Testnet only - not production ready
+- Limited to Polygon Amoy network
 
-// 5. Retailer marks delivered
-updateStatus(batchId, 2)  // 2 = Delivered
+## Team Information
 
-// 6. View complete history
-getStatusHistory(batchId)
-```
-
+**Course:** CSE 540 - Engineering Blockchain Applications  
+**Institution:** Arizona State University  
+**Semester:** Fall 2025
 
 ## Team Members
 
 | Name | Role | GitHub | Contribution |
 |------|------|--------|-------------|
-| Harshvardhan Vikrambhai Nagar | Smart Contract architect | [@harshvardhanvn1] | Contract development, deployment |
+| Harshvardhan Vikrambhai Nagar | Project Lead | [@harshvardhanvn1] | Contract development, deployment, React UI, Web3 Integration |
 | Vedant Padole | Smart Contract architect| [@VedantPadole1405] | Contract development, deployment |
 | Samik Nayak | Frontend Lead | [@scnyk] | React UI, Web3 integration |
 | Prarthan | Project Manager | [@Prxthn] | Coordination, reporting |
 
----
+## Resources and References
 
-## Important Links
+**Documentation:**
+- Solidity: https://docs.soliditylang.org
+- Web3.js: https://web3js.readthedocs.io
+- React: https://react.dev
+- Polygon: https://docs.polygon.technology
 
-- **Live Contract:** [PolygonScan](https://amoy.polygonscan.com/address/0x2c5e8F70139Ac595776434C99526F982B126a858)
-- **Network Faucet:** [Get Test POL](https://faucet.polygon.technology)
-- **IPFS Gateway:** [Pinata](https://pinata.cloud)
-- **Remix IDE:** [remix.ethereum.org](https://remix.ethereum.org)
+**Tools Used:**
+- Remix IDE for contract development
+- MetaMask for wallet management
+- Vercel for frontend deployment
+- GitHub for version control
 
----
+## License
 
-## Security Considerations
+This project is developed for academic purposes as part of CSE 540 coursework at Arizona State University.
 
-### **Implemented Security Measures**
-- Role-based access control
-- Input validation on all functions
-- Duplicate transaction prevention
-- Status progression enforcement
-- Ownership verification before transfers
-- Self-transfer prevention
-- Role verification for recipients
+## Contact
 
-### **Known Limitations**
-- Testnet only (not production-ready)
-- Centralized role assignment (admin-controlled)
-- No multi-signature support
-- Limited to single product per batch ID
-- Gas costs on mainnet would be higher
-
-### **Future Improvements**
-- Implement multi-signature for admin functions
-- Add batch splitting and merging
-- Enable cross-chain compatibility
-- Implement gasless transactions (meta-transactions)
-- Add dispute resolution mechanism
+For questions regarding this project, please open an issue in the GitHub repository.
 
 ---
 
-## Cost Analysis
-
-### **Deployment Costs (Polygon Amoy Testnet)**
-| Operation | Gas Used | Cost (POL) | Cost (USD)* |
-|-----------|----------|------------|-------------|
-| Contract Deployment | ~1,500,000 | 0.08 | ~$0.08 |
-| Register Product | ~140,000 | 0.0002 | ~$0.0002 |
-| Transfer Custody | ~55,000 | 0.0001 | ~$0.0001 |
-| Update Status | ~60,000 | 0.0001 | ~$0.0001 |
-| Assign Role | ~45,000 | 0.00005 | ~$0.00005 |
-
-*Estimated testnet costs. Mainnet costs would vary based on network congestion.
-
+**Important Note:** This system is deployed on Polygon Amoy testnet using test tokens. It is designed for educational purposes and demonstration only, not for production use.

@@ -1,70 +1,226 @@
-# Getting Started with Create React App
+# Supply Chain App Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+React-based user interface for the blockchain supply chain provenance system.
+
+## Overview
+
+This application provides a web interface for interacting with the AgriProvenance smart contract deployed on Polygon Amoy testnet. Users can register products, transfer ownership, update status, and view complete audit trails.
+
+## Technology Stack
+
+- React 19.2.0
+- Web3.js 1.10.0
+- Bootstrap 5.3.8
+- MetaMask integration
+
+## Quick Start
+```bash
+npm install
+echo "REACT_APP_CONTRACT_ADDRESS=0x2c5e8F70139Ac595776434C99526F982B126a858" > .env
+npm start
+```
+
+Access the application at http://localhost:3000
+
+## Application Structure
+
+### Components
+
+**AssignRole.js**
+- Function: Assign roles to Ethereum addresses
+- Permission: Admin only
+- Contract Method: assignRole(address, uint8)
+
+**RegisterProduct.js**
+- Function: Create new product entries
+- Permission: Manufacturer only
+- Contract Method: registerProduct(bytes32, string, uint8, uint8)
+
+**TransferProduct.js**
+- Function: Transfer product ownership
+- Permission: Current product owner
+- Contract Method: transferCustody(bytes32, address)
+
+**UpdateStatus.js**
+- Function: Update product status
+- Permission: Current product owner
+- Contract Method: updateStatus(bytes32, uint8)
+
+**ProductList.js**
+- Function: View product details
+- Permission: All users
+- Contract Method: getBatch(bytes32)
+
+**StatusHistory.js**
+- Function: View complete audit trail
+- Permission: All users
+- Contract Method: getStatusHistory(bytes32)
+
+### Utilities
+
+**web3.js**
+- Initializes Web3 provider using MetaMask
+- Handles wallet connection
+- Manages network switching to Polygon Amoy
+
+**contract.js**
+- Creates smart contract instance
+- Manages contract address configuration
+- Provides contract getter functions
+
+**permissions.js**
+- Defines role-based permissions
+- Controls component visibility
+- Maps roles to allowed actions
+
+## Configuration
+
+### Environment Variables
+
+Create `.env` file:
+```
+REACT_APP_CONTRACT_ADDRESS=0x2c5e8F70139Ac595776434C99526F982B126a858
+```
+
+### MetaMask Setup
+
+1. Install MetaMask extension
+2. Add Polygon Amoy network:
+   - Network Name: Polygon Amoy Testnet
+   - RPC URL: https://rpc-amoy.polygon.technology
+   - Chain ID: 80002
+   - Symbol: POL
+3. Get test tokens from https://faucet.polygon.technology
 
 ## Available Scripts
 
-In the project directory, you can run:
-
 ### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Runs the app in development mode at http://localhost:3000
 
 ### `npm run build`
+Builds the app for production to the `build` folder
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### `npm test`
+Launches the test runner in interactive watch mode
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Implementation Details
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Web3 Integration
+- Single Web3 instance shared across application
+- Automatic detection of MetaMask provider
+- Network validation on every interaction
+- Automatic network switching when needed
 
-### `npm run eject`
+### Transaction Handling
+All write operations use explicit gas estimation:
+1. Estimate gas for transaction
+2. Add 20% buffer for safety
+3. Fetch current gas price
+4. Send transaction with calculated parameters
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+This approach handles RPC provider variations and prevents gas estimation failures.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### ID Normalization
+Product IDs can be entered as:
+- Plain text (converted to bytes32)
+- Hex string (used directly)
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Normalization function ensures consistent format.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Error Handling
+- Try-catch blocks on all blockchain calls
+- User-friendly error messages
+- Detailed console logging for debugging
+- Transaction revert detection
 
-## Learn More
+## Deployment
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Vercel Deployment
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+1. Push code to GitHub
+2. Import project in Vercel
+3. Configure:
+   - Framework: Create React App
+   - Root Directory: `client/supply-chain-app`
+   - Build Command: `npm run build`
+   - Output Directory: `build`
+4. Add environment variable:
+   - REACT_APP_CONTRACT_ADDRESS: 0x2c5e8F70139Ac595776434C99526F982B126a858
+5. Deploy
 
-### Code Splitting
+## Troubleshooting
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### MetaMask Not Connecting
+- Ensure MetaMask is installed and unlocked
+- Check you're on Polygon Amoy network
+- Refresh the page
+- Check browser console for errors
 
-### Analyzing the Bundle Size
+### Transaction Failures
+- Verify sufficient POL balance for gas
+- Confirm correct role for operation
+- Ensure you own the product (for transfers/updates)
+- Check network connectivity
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Contract Not Loading
+- Verify contract address in .env
+- Confirm Polygon Amoy network connection
+- Check RPC endpoint is responding
+- Review browser console logs
 
-### Making a Progressive Web App
+### Build Issues
+```bash
+rm -rf node_modules package-lock.json
+npm install
+npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Security Notes
 
-### Advanced Configuration
+- Private keys never stored in application
+- Environment variables are public in frontend builds
+- All permissions enforced by smart contract
+- MetaMask handles transaction signing
+- Always verify transaction details before confirming
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Browser Support
 
-### Deployment
+Tested on:
+- Chrome (recommended)
+- Firefox
+- Brave
+- Edge
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+MetaMask extension required for all browsers.
 
-### `npm run build` fails to minify
+## Role Permissions Matrix
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+| Action | Admin | Manufacturer | Distributor | Retailer | Regulator |
+|--------|-------|--------------|-------------|----------|-----------|
+| Assign Roles | Yes | No | No | No | No |
+| Register Product | No | Yes | No | No | No |
+| Transfer (if owner) | No | Yes | Yes | Yes | No |
+| Update Status (if owner) | No | Yes | Yes | Yes | No |
+| View Products | Yes | Yes | Yes | Yes | Yes |
+| View History | Yes | Yes | Yes | Yes | Yes |
+
+Note: Admin is determined by wallet address, not role assignment.
+
+## Performance
+
+- Lazy loading of product data
+- Efficient state management with React hooks
+- Minimal blockchain queries
+- Optimized re-renders
+
+## Additional Resources
+
+- Main project documentation: See root README.md
+- Smart contract: See contracts/Agriprovenance.sol
+- Live contract: https://amoy.polygonscan.com/address/0x2c5e8F70139Ac595776434C99526F982B126a858
+
+---
+
+**Live Application:** https://blockchain-supply-chain-provenance.vercel.app
+
+This is a Create React App. Learn more at https://create-react-app.dev
