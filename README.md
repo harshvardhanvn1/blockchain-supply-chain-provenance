@@ -1,6 +1,6 @@
 # Blockchain-Based Supply Chain Provenance System
 
-A decentralized supply chain tracking system built with Solidity and React for CSE 540 - Engineering Blockchain Applications at Arizona State University.
+A decentralized supply chain tracking system built with Solidity, React and web3.js.
 
 **Live Demo:** (https://blockchain-supply-chain-provenance.vercel.app/)
 
