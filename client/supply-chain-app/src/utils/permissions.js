@@ -1,24 +1,21 @@
-// Permission map for roles -> allowed frontend components
-// UI shows forms based on role, but smart contract enforces actual permissions
+// Permission map based on ACTUAL smart contract enforcement
+// Contract enforces: Manufacturer can register, Owner can transfer/update
 
 const PERMISSIONS = {
-  // Manufacturer: Can register products and transfer ownership
-  Manufacturer: ['registerProduct', 'transferProduct', 'updateStatus', 'getBatch', 'productList'],
+  // Manufacturer: Can register products + transfer/update what they own
+  Manufacturer: ['registerProduct', 'transferProduct', 'updateStatus', 'productList', 'statusHistory'],
   
-  // Distributor: Can transfer and update status
-  Distributor: ['transferProduct', 'updateStatus', 'getBatch', 'productList'],
+  // Distributor: Can transfer/update products they own
+  Distributor: ['transferProduct', 'updateStatus', 'productList', 'statusHistory'],
   
-  // Retailer: Can transfer and update status (especially mark as Delivered)
-  Retailer: ['transferProduct', 'updateStatus', 'getBatch', 'productList'],
+  // Retailer: Can transfer/update products they own (mark as Delivered)
+  Retailer: ['transferProduct', 'updateStatus', 'productList', 'statusHistory'],
   
-  // Regulator: Can see EVERYTHING for auditing/oversight (including assign roles)
-  Regulator: ['assignRole', 'registerProduct', 'transferProduct', 'updateStatus', 'getBatch', 'productList'],
+  // Regulator: Can view everything for auditing
+  Regulator: ['productList', 'statusHistory'],
   
-  // Admin: Same as Regulator - full access
-  Admin: ['assignRole', 'registerProduct', 'transferProduct', 'updateStatus', 'getBatch', 'productList'],
-  
-  // None/Consumer: Can only view
-  None: ['getBatch', 'productList'],
+  // None/Consumer: Can only view products
+  None: ['productList'],
 };
 
 export function getPermissionsForRole(roleName) {

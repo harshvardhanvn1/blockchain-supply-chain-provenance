@@ -8,12 +8,14 @@ import TransferProduct from './components/TransferProduct';
 import ProductList from './components/ProductList';
 import AssignRole from './components/AssignRole';
 import UpdateStatus from './components/UpdateStatus';
+import StatusHistory from './components/StatusHistory';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
 function App() {
 	const [account, setAccount] = useState('');
 	const [role, setRole] = useState('None');
+	const [adminAddress, setAdminAddress] = useState('');
 
 	const handleConnect = async () => {
 		const acc = await connectWallet();
@@ -41,6 +43,17 @@ function App() {
 		}
 	};
 
+	const fetchAdmin = async () => {
+		try {
+			const contract = getContract();
+			const admin = await contract.methods.admin().call();
+			setAdminAddress(admin);
+			console.log("Contract admin:", admin);
+		} catch (err) {
+			console.error("Failed to fetch admin:", err);
+		}
+	};
+
 	useEffect(() => {
 		const envAddr = process.env.REACT_APP_CONTRACT_ADDRESS;
 		if (envAddr) {
@@ -65,7 +78,10 @@ function App() {
 		const stored = window.localStorage.getItem('contractAddress') || contract.options.address || '';
 		setContractInput(stored);
 
-		if (account) fetchAndSetRole(account);
+		if (account) {
+			fetchAndSetRole(account);
+			fetchAdmin();
+		}
 	}, [account]);
 
 	const handleSaveContract = () => {
@@ -90,8 +106,11 @@ function App() {
 				const contract = getContract();
 				const total = await contract.methods.totalBatches().call();
 				console.log('totalBatches:', total);
-				if (account) await fetchAndSetRole(account);
-				alert('Contract address saved — validation succeeded');
+				if (account) {
+					await fetchAndSetRole(account);
+					await fetchAdmin();
+				}
+				alert('Contract address saved – validation succeeded');
 			} catch (err) {
 				console.error('Contract validation failed:', err);
 				alert('Contract address saved but validation failed: ' + (err.message || err));
@@ -107,21 +126,31 @@ function App() {
 		alert('Contract address cleared');
 	};
 
+	// Check if current user is admin
+	const isAdmin = adminAddress && account && account.toLowerCase() === adminAddress.toLowerCase();
+
 	return (
 		<div className="App">
 			<nav className="navbar navbar-dark bg-dark">
 				<div className="container">
-					<span className="navbar-brand">Supply Chain Tracker</span>
-					{role && <span className="badge bg-info text-dark ms-3">Role: {role}</span>}
-					{account ? (
-						<span className="text-white">
-							{account.substring(0, 6)}...{account.substring(38)}
-						</span>
-					) : (
-						<button className="btn btn-primary" onClick={handleConnect}>
-							Connect Wallet
-						</button>
-					)}
+					<span className="navbar-brand">🌾 AgriProvenance Supply Chain</span>
+					<div className="d-flex align-items-center gap-3">
+						{role && role !== 'None' && (
+							<span className="badge bg-info text-dark">Role: {role}</span>
+						)}
+						{isAdmin && (
+							<span className="badge bg-danger">Admin</span>
+						)}
+						{account ? (
+							<span className="text-white">
+								{account.substring(0, 6)}...{account.substring(38)}
+							</span>
+						) : (
+							<button className="btn btn-primary" onClick={handleConnect}>
+								Connect Wallet
+							</button>
+						)}
+					</div>
 				</div>
 			</nav>
 
@@ -154,11 +183,28 @@ function App() {
 			<div className="container mt-5">
 				{account ? (
 					<>
-						{hasPermission(role, 'assignRole') && <AssignRole account={account} />}
+						{/* Admin-only functions */}
+						{isAdmin && (
+							<div className="alert alert-warning">
+								<strong>⚠️ Admin Panel:</strong> You can assign roles to users
+							</div>
+						)}
+						{isAdmin && <AssignRole account={account} />}
+
+						{/* Role-based functions */}
 						{hasPermission(role, 'registerProduct') && <RegisterProduct account={account} />}
 						{hasPermission(role, 'transferProduct') && <TransferProduct account={account} />}
 						{hasPermission(role, 'updateStatus') && <UpdateStatus account={account} />}
+						{hasPermission(role, 'statusHistory') && <StatusHistory />}
 						{hasPermission(role, 'productList') && <ProductList />}
+
+						{role === 'None' && (
+							<div className="alert alert-info">
+								<h5>👋 Welcome!</h5>
+								<p>You don't have an assigned role yet. Contact the administrator to get access.</p>
+								<p className="mb-0"><small>You can still view product details below.</small></p>
+							</div>
+						)}
 					</>
 				) : (
 					<div className="alert alert-info">Please connect your MetaMask wallet to continue</div>
