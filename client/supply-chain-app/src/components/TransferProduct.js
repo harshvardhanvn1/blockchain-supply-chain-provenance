@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import contract from '../utils/contract';
+import { getContract } from '../utils/contract';
 import web3 from '../utils/web3';
 
 function TransferProduct({ account }) {
@@ -20,15 +20,36 @@ function TransferProduct({ account }) {
 	const handleTransfer = async (e) => {
 		e.preventDefault();
 		setLoading(true);
+		const contract = getContract();
+		
 		try {
 			const normalized = normalizeId(id);
-			await contract.methods.transferCustody(normalized, newOwner).send({ from: account });
+			console.log("📌 Transferring custody:", normalized);
+
+			// Estimate gas
+			const gasEstimate = await contract.methods
+				.transferCustody(normalized, newOwner)
+				.estimateGas({ from: account });
+			console.log("✅ Gas estimate:", gasEstimate);
+
+			// Get gas price
+			const gasPrice = await web3.eth.getGasPrice();
+
+			// Send transaction
+			await contract.methods
+				.transferCustody(normalized, newOwner)
+				.send({ 
+					from: account,
+					gas: Math.floor(gasEstimate * 1.2),
+					gasPrice: gasPrice
+				});
+
 			alert('Custody transferred successfully!');
 			setId('');
 			setNewOwner('');
 		} catch (error) {
 			console.error(error);
-			alert('Error transferring custody');
+			alert('Error transferring custody: ' + error.message);
 		}
 		setLoading(false);
 	};
@@ -36,16 +57,16 @@ function TransferProduct({ account }) {
 	return (
 		<div className="card mb-4">
 			<div className="card-body">
-				<h5 className="card-title">Transfer Custody (contract: transferCustody)</h5>
+				<h5 className="card-title">Transfer Custody</h5>
 				<form onSubmit={handleTransfer}>
 					<div className="mb-3">
-						<label className="form-label">ID (bytes32 or text)</label>
+						<label className="form-label">Product ID (bytes32 or text)</label>
 						<input
 							type="text"
 							className="form-control"
 							value={id}
 							onChange={(e) => setId(e.target.value)}
-							placeholder="0x... or plain text"
+							placeholder="batch001 or 0x..."
 							required
 						/>
 					</div>

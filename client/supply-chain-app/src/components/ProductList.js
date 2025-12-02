@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import contract from '../utils/contract';
+import { getContract } from '../utils/contract';
 import web3 from '../utils/web3';
 
 function ProductList() {
@@ -18,113 +18,137 @@ function ProductList() {
 		}
 	};
 
+	const formatTimestamp = (timestamp) => {
+		if (!timestamp || timestamp === '0') return 'N/A';
+		const date = new Date(parseInt(timestamp) * 1000);
+		return date.toLocaleString();
+	};
+
 	const fetchBatch = async (e) => {
 		e && e.preventDefault();
 		setLoading(true);
+		setError('');
+		setBatch(null);
+
+		const contract = getContract();
+		
 		try {
 			const normalized = normalizeId(id);
-			const contractAddr = contract.options.address;
-			if (!contractAddr) throw new Error('Contract address is not set in the app');
+			console.log("📌 Fetching batch:", normalized);
 
-			// low-level call to see raw return data (helps diagnose ABI/address/network issues)
-			const data = contract.methods.getBatch(normalized).encodeABI();
-			const raw = await web3.eth.call({ to: contractAddr, data });
-			console.log('raw getBatch return:', raw);
-			if (!raw || raw === '0x' || raw === '0x0') {
-				throw new Error('Empty return from node — possible revert, no code at address, or wrong network');
-			}
+			// Call getBatch directly - no need for manual encoding!
+			const result = await contract.methods.getBatch(normalized).call();
+			
+			console.log("✅ Batch data received:", result);
 
-			// decode returned parameters using web3 ABI decoder (types from ABI)
-			const types = [
-				'bytes32',
-				'address',
-				'string',
-				'string',
-				'string',
-				'string',
-				'uint256',
-				'uint256',
-			];
-			let decoded;
-			try {
-				decoded = web3.eth.abi.decodeParameters(types, raw);
-			} catch (decErr) {
-				console.error('Failed to decode parameters:', decErr);
-				throw new Error('Parameter decoding failed — ABI mismatch or unexpected return format');
-			}
-
-			// map decoded values into result object similar to contract.getBatch return
-			const result = {
-				batchId: decoded[0],
-				owner: decoded[1],
-				status: decoded[2],
-				productType: decoded[3],
-				qualityType: decoded[4],
-				metaCid: decoded[5],
-				createdAt: decoded[6],
-				lastUpdated: decoded[7],
+			// Result is already decoded by Web3.js
+			const batchData = {
+				batchId: result.batchId || result[0],
+				owner: result.owner || result[1],
+				status: result.status || result[2],
+				productType: result.productType || result[3],
+				qualityType: result.qualityType || result[4],
+				metaCid: result.metaCid || result[5],
+				createdAt: result.createdAt || result[6],
+				lastUpdated: result.lastUpdated || result[7],
 			};
 
-			setBatch(result);
-			setError('');
+			setBatch(batchData);
 		} catch (err) {
-			console.error('getBatch error:', err);
-			setError(err && err.message ? err.message : String(err));
-			setBatch(null);
+			console.error('❌ getBatch error:', err);
+			
+			// Better error messages
+			if (err.message.includes('revert')) {
+				setError('Product not found. Make sure the ID is correct and the product exists.');
+			} else if (err.message.includes('network')) {
+				setError('Network error. Check your connection and ensure you are on Polygon Amoy testnet.');
+			} else {
+				setError(err.message || 'Unknown error occurred');
+			}
 		}
+		
 		setLoading(false);
 	};
 
 	return (
 		<div className="card mb-4">
 			<div className="card-body">
-				<h5 className="card-title">Get Batch (contract: getBatch)</h5>
+				<h5 className="card-title">View Product Details</h5>
 				<form onSubmit={fetchBatch} className="mb-3">
 					<div className="mb-3">
-						<label className="form-label">ID (bytes32 or text)</label>
+						<label className="form-label">Product ID (bytes32 or text)</label>
 						<input
 							type="text"
 							className="form-control"
 							value={id}
 							onChange={(e) => setId(e.target.value)}
-							placeholder="0x... or plain text"
+							placeholder="batch001 or 0x..."
 							required
 						/>
+						<small className="form-text text-muted">
+							Enter the product ID you used when registering
+						</small>
 					</div>
 					<button className="btn btn-info" type="submit" disabled={loading}>
-						{loading ? 'Fetching...' : 'Fetch Batch'}
+						{loading ? 'Fetching...' : 'Fetch Product'}
 					</button>
 				</form>
 
-				{error && (
-					<div className="alert alert-danger">{error}</div>
-				)}
+				{error && <div className="alert alert-danger">{error}</div>}
+				
 				{batch && (
-					<div>
+					<div className="border-top pt-3">
+						<h6 className="text-success mb-3">✅ Product Found</h6>
 						<dl className="row">
 							<dt className="col-sm-3">Batch ID</dt>
-							<dd className="col-sm-9">{batch.batchId}</dd>
+							<dd className="col-sm-9">
+								<code>{batch.batchId}</code>
+							</dd>
 
-							<dt className="col-sm-3">Owner</dt>
-							<dd className="col-sm-9">{batch.owner}</dd>
+							<dt className="col-sm-3">Current Owner</dt>
+							<dd className="col-sm-9">
+								<code>{batch.owner}</code>
+							</dd>
 
 							<dt className="col-sm-3">Status</dt>
-							<dd className="col-sm-9">{batch.status}</dd>
+							<dd className="col-sm-9">
+								<span className={`badge ${
+									batch.status === 'Created' ? 'bg-primary' :
+									batch.status === 'InTransit' ? 'bg-warning' :
+									batch.status === 'Delivered' ? 'bg-success' : 'bg-secondary'
+								}`}>
+									{batch.status}
+								</span>
+							</dd>
 
 							<dt className="col-sm-3">Product Type</dt>
-							<dd className="col-sm-9">{batch.productType}</dd>
+							<dd className="col-sm-9">
+								<span className="badge bg-info">{batch.productType}</span>
+							</dd>
 
 							<dt className="col-sm-3">Quality Type</dt>
-							<dd className="col-sm-9">{batch.qualityType}</dd>
+							<dd className="col-sm-9">
+								<span className="badge bg-info">{batch.qualityType}</span>
+							</dd>
 
-							<dt className="col-sm-3">metaCid</dt>
-							<dd className="col-sm-9">{batch.metaCid}</dd>
+							<dt className="col-sm-3">Metadata CID</dt>
+							<dd className="col-sm-9">
+								<code>{batch.metaCid}</code>
+							</dd>
 
-							<dt className="col-sm-3">Created At (timestamp)</dt>
-							<dd className="col-sm-9">{batch.createdAt}</dd>
+							<dt className="col-sm-3">Created At</dt>
+							<dd className="col-sm-9">
+								{formatTimestamp(batch.createdAt)}
+								<br />
+								<small className="text-muted">Timestamp: {batch.createdAt}</small>
+							</dd>
 
 							<dt className="col-sm-3">Last Updated</dt>
-							<dd className="col-sm-9">{batch.lastUpdated}</dd>
+							<dd className="col-sm-9">
+								{formatTimestamp(batch.lastUpdated)}
+								<br />
+								<small className="text-muted">Timestamp: {batch.lastUpdated}</small>
+							</dd>
 						</dl>
 					</div>
 				)}

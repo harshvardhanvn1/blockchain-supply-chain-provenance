@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connectWallet, ensureAmoyNetwork } from './utils/web3';
-import contract, { setContractAddress } from './utils/contract';
+import { getContract, setContractAddress } from './utils/contract';
 import { hasPermission } from './utils/permissions';
 import web3 from './utils/web3';
 import RegisterProduct from './components/RegisterProduct';
@@ -19,7 +19,6 @@ function App() {
 		const acc = await connectWallet();
 		setAccount(acc);
 
-		// Prompt user to switch/add Polygon Amoy Testnet if needed
 		try {
 			const ok = await ensureAmoyNetwork();
 			if (!ok) console.warn('Could not ensure Amoy network in wallet');
@@ -28,9 +27,10 @@ function App() {
 		}
 	};
 
-	// fetch role for connected account and set local role state
 	const fetchAndSetRole = async (acct) => {
-		if (!acct || !contract || !contract.methods) return setRole('None');
+		if (!acct) return setRole('None');
+		const contract = getContract();
+		if (!contract || !contract.methods) return setRole('None');
 		try {
 			const r = await contract.methods.getUserRole(acct).call();
 			console.log('user role from contract:', r);
@@ -42,33 +42,29 @@ function App() {
 	};
 
 	useEffect(() => {
-		// set contract address from env if present, otherwise prompt once
 		const envAddr = process.env.REACT_APP_CONTRACT_ADDRESS;
 		if (envAddr) {
 			setContractAddress(envAddr);
 			console.log('Contract address set from env:', envAddr);
 		} else {
-			// prompt for address once (useful for dev without .env)
 			const addr = window.localStorage.getItem('contractAddress') || '';
 			if (addr) setContractAddress(addr);
 		}
 	}, []);
 
-	const [contractAddr, setContractAddr] = React.useState('');
-	const [networkId, setNetworkId] = React.useState(null);
-	const [contractInput, setContractInput] = React.useState('');
+	const [contractAddr, setContractAddr] = useState('');
+	const [networkId, setNetworkId] = useState(null);
+	const [contractInput, setContractInput] = useState('');
 
 	useEffect(() => {
-		// update contract/network display
+		const contract = getContract();
 		setContractAddr(contract.options.address || 'not set');
 		if (web3 && web3.eth && web3.eth.net) {
 			web3.eth.net.getId().then((id) => setNetworkId(id)).catch(() => setNetworkId(null));
 		}
-		// keep the editable input in sync
 		const stored = window.localStorage.getItem('contractAddress') || contract.options.address || '';
 		setContractInput(stored);
 
-		// if account already connected, fetch role
 		if (account) fetchAndSetRole(account);
 	}, [account]);
 
@@ -78,9 +74,7 @@ function App() {
 		window.localStorage.setItem('contractAddress', contractInput);
 		setContractAddr(contractInput);
 
-		// quick validation: check that code exists at address then call a read-only method
 		(async () => {
-			// Try to ensure the wallet is on Amoy before validating contract code
 			try {
 				await ensureAmoyNetwork();
 			} catch (e) {
@@ -93,9 +87,9 @@ function App() {
 					alert('Contract address saved but no contract code found at this address on the connected network.');
 					return;
 				}
+				const contract = getContract();
 				const total = await contract.methods.totalBatches().call();
 				console.log('totalBatches:', total);
-				// fetch role after setting the contract address
 				if (account) await fetchAndSetRole(account);
 				alert('Contract address saved — validation succeeded');
 			} catch (err) {

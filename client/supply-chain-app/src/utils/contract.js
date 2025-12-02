@@ -1,13 +1,18 @@
-import web3 from './web3';
+import web3 from './web3';  // ← Import the shared Web3 instance
 import ABI from '../contracts/Agriprovenance_ABI.json';
 
-const CONTRACT_ADDRESS = process.env.REACT_APP_CONTRACT_ADDRESS || '';
-
-const contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
+let contract = null;
+let currentAddress = process.env.REACT_APP_CONTRACT_ADDRESS || '';
 
 export function setContractAddress(address) {
-	if (!address) return;
-	contract.options.address = address;
+  if (!address) return;
+  currentAddress = address;
+  contract = new web3.eth.Contract(ABI, currentAddress);  // ← Use shared web3
 }
 
-export default contract;
+export function getContract() {
+  if (!contract) {
+    contract = new web3.eth.Contract(ABI, currentAddress);  // ← Use shared web3
+  }
+  return contract;
+}
